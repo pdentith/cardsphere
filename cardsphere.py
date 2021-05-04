@@ -3,15 +3,20 @@ from selenium.webdriver.common.keys import Keys
 from selenium.webdriver.support.wait import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.common.by import By
+from selenium.webdriver.chrome.options import Options
 import configparser
 from fbchat import Client
 from fbchat.models import *
 import logging
+import os
+import re
 
-
-browser = webdriver.Chrome()
+options = Options()
+options.headless = True
+browser = webdriver.Chrome(executable_path='/Users/Peter/Downloads/chromedriver', chrome_options=options)
 config = configparser.ConfigParser()
-config.read('config.ini')
+config.read(os.path.join(os.path.dirname(__file__), 'config.ini'))
+config.read('Users/Peter/Repos/Cardsphere/config.ini')
 alert_user = False
 
 #Login
@@ -42,7 +47,8 @@ for x in trades:
         if(index == 3):
             trade_amount = float(text.replace('$', ''))
             print('trade_amount = ' + str(trade_amount))
-        
+    
+    trade_string = re.sub('[^-.@$%_a-zA-Z0-9]', " ", trade_string)
     print(trade_string)
     if(trade_amount >= float(config['cardsphere']['package_value'])):
         alert_user = True
@@ -50,7 +56,6 @@ for x in trades:
 
 #send facebook message
 if(alert_user == True):
-    #browser.get('http://www.facebook.com/')
     fuser = config['facebook']['username']
     fpass = config['facebook']['password']
     client = Client(fuser, fpass, user_agent="Mozilla/5.0 (Windows NT 10.0; WOW64; Trident/7.0; rv:11.0) like Gecko")
