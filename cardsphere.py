@@ -33,7 +33,11 @@ browser.get('http://www.cardsphere.com/send')
 
 wait = WebDriverWait(browser, 10).until(EC.presence_of_element_located((By.CLASS_NAME, "message")))
 
-trades = browser.find_elements_by_class_name('package-heading')
+try:
+    trades = browser.find_elements_by_class_name('package-heading')
+except:
+    print('Unable to find trades')
+    browser.quit()
 
 for x in trades:
     print('In a package')
